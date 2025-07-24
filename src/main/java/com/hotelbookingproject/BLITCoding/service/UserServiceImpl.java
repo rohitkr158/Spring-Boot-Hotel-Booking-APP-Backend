@@ -21,15 +21,17 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+
     @Override
     public User registerUser(User user) {
-        if(userRepository.existsByEmail(user.getEmail())){
-            throw  new UserAlreadyExistsException(user.getEmail() +
-                    "already exists");
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserAlreadyExistsException(user.getEmail() + "already exists");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Role userRole = roleRepository.findByName("ROLE_USER").get();
+//        Role userRole = roleRepository.findByName("ROLE_USER").get();
+        Role userRole = roleRepository.findByName("ROLE_USER").orElseThrow(() -> new IllegalStateException("ROLE_USER not found in database"));
         user.setRoles(Collections.singletonList(userRole));
+
 
         return userRepository.save(user);
     }
@@ -43,7 +45,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(String email) {
         User theUser = getUser(email);
-        if(theUser != null){
+        if (theUser != null) {
             userRepository.deleteByEmail(email);
         }
 
@@ -53,8 +55,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(String email) {
 
-        return userRepository.findByEmail(email).orElseThrow(
-                () -> new UsernameNotFoundException("User not found")
-        );
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

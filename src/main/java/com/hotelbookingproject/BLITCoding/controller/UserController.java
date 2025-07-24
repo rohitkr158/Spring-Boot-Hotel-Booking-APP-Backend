@@ -53,12 +53,4 @@ public class UserController {
                     "error deleting user");
         }
     }
-
-
-
-
-
-
-
-
 }
